@@ -44,7 +44,7 @@ app.use(morgan('combined'));
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:5173',
-  'https://builder.io',
+  'http://hyipro.online',
   'https://hyipro-frontend.pages.dev',
   'http://127.0.0.1:5173',
   process.env.FRONTEND_URL
