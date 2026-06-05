@@ -76,6 +76,12 @@ const getReferralStats = async (req, res, next) => {
         [user_id]
       );
 
+      // Get user's referral code
+      const [[userData]] = await connection.execute(
+        `SELECT referral_code FROM users WHERE id = ?`,
+        [user_id]
+      );
+
       // Get active referrals
       const [[activeCount]] = await connection.execute(
         `SELECT COUNT(*) as total FROM referrals WHERE referrer_id = ? AND status = 'active'`,
@@ -108,7 +114,7 @@ const getReferralStats = async (req, res, next) => {
          JOIN users u ON r.referred_user_id = u.id
          LEFT JOIN referral_commissions rc ON r.referrer_id = rc.referrer_id AND r.referred_user_id = rc.referred_user_id
          WHERE r.referrer_id = ?
-         GROUP BY r.id
+         GROUP BY r.id, r.referred_user_id, u.email, u.first_name, u.last_name, r.status, r.created_at
          ORDER BY r.created_at DESC`,
         [user_id]
       );
@@ -119,7 +125,8 @@ const getReferralStats = async (req, res, next) => {
           active_referrals: activeCount.total,
           total_commission_earned: parseFloat(commissionStats.total_earned),
           pending_commission: parseFloat(commissionStats.pending),
-          total_paid: parseFloat(commissionStats.total_paid)
+          total_paid: parseFloat(commissionStats.total_paid),
+          referral_code: userData?.referral_code || null
         },
         referrals
       });

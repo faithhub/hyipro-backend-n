@@ -240,15 +240,30 @@ const register = async (req, res, next) => {
         return res.status(409).json({ error: 'Email already registered' });
       }
 
+      // // Hash password
+      // const hashedPassword = await bcrypt.hash(password, 12);
+
+      // // Create user
+      // const [result] = await connection.execute(
+      //   'INSERT INTO users (email, password_hash, first_name, last_name, country) VALUES (?, ?, ?, ?, ?)',
+      //   [email, hashedPassword, first_name || null, last_name || null, country || null]
+      // );
+
+      // const userId = result.insertId;
+
       // Hash password
       const hashedPassword = await bcrypt.hash(password, 12);
 
+      // Generate unique referral code for this user
+      const crypto = require('crypto');
+      // const userReferralCode = crypto.randomBytes(4).toString('hex').toUpperCase();
+      const userReferralCode = 'HYIPRO' + crypto.randomBytes(3).toString('hex').toUpperCase();
+
       // Create user
       const [result] = await connection.execute(
-        'INSERT INTO users (email, password_hash, first_name, last_name, country) VALUES (?, ?, ?, ?, ?)',
-        [email, hashedPassword, first_name || null, last_name || null, country || null]
+        'INSERT INTO users (email, password_hash, first_name, last_name, country, referral_code) VALUES (?, ?, ?, ?, ?, ?)',
+        [email, hashedPassword, first_name || null, last_name || null, country || null, userReferralCode]
       );
-
       const userId = result.insertId;
 
       logAudit(req, 'auth.register', { userId, entityType: 'user', entityId: userId, metadata: { country: country || null } });
@@ -260,28 +275,49 @@ const register = async (req, res, next) => {
       );
 
       // Handle referral if referral code is provided
+      // if (referral_code) {
+      //   try {
+      //     // Find referrer by referral code
+      //     const [referrers] = await connection.execute(
+      //       `SELECT referrer_id FROM referrals WHERE referral_code = ? LIMIT 1`,
+      //       [referral_code]
+      //     );
+
+      //     if (referrers.length > 0) {
+      //       const referrer_id = referrers[0].referrer_id;
+
+      //       // Create referral record
+      //       await connection.execute(
+      //         `INSERT INTO referrals (referrer_id, referred_user_id, referral_code, status)
+      //          VALUES (?, ?, ?, 'active')`,
+      //         [referrer_id, userId, referral_code]
+      //       );
+      //       console.log(`✅ Referral created: User ${userId} referred by ${referrer_id}`);
+      //     }
+      //   } catch (referralError) {
+      //     console.error('Error processing referral:', referralError.message);
+      //     // Don't fail registration if referral processing fails
+      //   }
+      // }
+
       if (referral_code) {
         try {
-          // Find referrer by referral code
+          // Find referrer by their referral code stored on users table
           const [referrers] = await connection.execute(
-            `SELECT referrer_id FROM referrals WHERE referral_code = ? LIMIT 1`,
+            `SELECT id FROM users WHERE referral_code = ? LIMIT 1`,
             [referral_code]
           );
-
           if (referrers.length > 0) {
-            const referrer_id = referrers[0].referrer_id;
-            
-            // Create referral record
+            const referrer_id = referrers[0].id;
             await connection.execute(
               `INSERT INTO referrals (referrer_id, referred_user_id, referral_code, status)
-               VALUES (?, ?, ?, 'active')`,
+            VALUES (?, ?, ?, 'active')`,
               [referrer_id, userId, referral_code]
             );
             console.log(`✅ Referral created: User ${userId} referred by ${referrer_id}`);
           }
         } catch (referralError) {
           console.error('Error processing referral:', referralError.message);
-          // Don't fail registration if referral processing fails
         }
       }
 
