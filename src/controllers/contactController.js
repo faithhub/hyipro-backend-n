@@ -48,6 +48,25 @@ const createContactMessage = async (req, res, next) => {
         console.error('Contact acknowledgement email failed:', mailError.message);
       }
 
+      try {
+        const adminEmail = process.env.RESEND_FROM_EMAIL || 'noreply@hyipro.com';
+        await sendEmail({
+          to: adminEmail,
+          subject: `New Contact Message from ${trimmedName}`,
+          html: `
+            <p><strong>New contact message received:</strong></p>
+            <p><strong>Name:</strong> ${trimmedName}</p>
+            <p><strong>Email:</strong> ${trimmedEmail}</p>
+            <p><strong>Message:</strong></p>
+            <blockquote style="color:#6b7280;">${trimmedMessage}</blockquote>
+            <p><strong>Submitted at:</strong> ${new Date().toLocaleString()}</p>
+          `,
+          text: `New contact message received:\n\nName: ${trimmedName}\nEmail: ${trimmedEmail}\nMessage:\n${trimmedMessage}\n\nSubmitted at: ${new Date().toLocaleString()}`,
+        });
+      } catch (mailError) {
+        console.error('Admin notification email failed:', mailError.message);
+      }
+
       res.status(201).json({ message: 'Contact message submitted successfully', id: result.insertId });
     } finally {
       connection.release();

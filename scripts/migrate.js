@@ -20,6 +20,7 @@ const createTables = async () => {
         last_name VARCHAR(100),
         phone VARCHAR(20),
         country VARCHAR(100),
+        referral_code VARCHAR(20) UNIQUE,
         kyc_verified BOOLEAN DEFAULT FALSE,
         role VARCHAR(10) DEFAULT 'user',
         status VARCHAR(10) DEFAULT 'active',

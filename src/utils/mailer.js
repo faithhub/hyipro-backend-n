@@ -1,25 +1,16 @@
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 
-const createTransporter = () => {
-  if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
-    throw new Error('SMTP configuration is missing');
-  }
-
-  return nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: parseInt(process.env.SMTP_PORT || '587', 10),
-    secure: process.env.SMTP_SECURE === 'true',
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
-};
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendEmail = async ({ to, subject, html, text }) => {
-  const transporter = createTransporter();
-  await transporter.sendMail({
-    from: process.env.SMTP_FROM || process.env.SMTP_USER,
+  if (!process.env.RESEND_API_KEY) {
+    throw new Error('RESEND_API_KEY is missing');
+  }
+
+  const fromEmail = process.env.RESEND_FROM_EMAIL || 'noreply@hyipro.com';
+
+  await resend.emails.send({
+    from: fromEmail,
     to,
     subject,
     html,

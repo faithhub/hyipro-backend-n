@@ -275,50 +275,35 @@ const register = async (req, res, next) => {
       );
 
       // Handle referral if referral code is provided
-      // if (referral_code) {
-      //   try {
-      //     // Find referrer by referral code
-      //     const [referrers] = await connection.execute(
-      //       `SELECT referrer_id FROM referrals WHERE referral_code = ? LIMIT 1`,
-      //       [referral_code]
-      //     );
-
-      //     if (referrers.length > 0) {
-      //       const referrer_id = referrers[0].referrer_id;
-
-      //       // Create referral record
-      //       await connection.execute(
-      //         `INSERT INTO referrals (referrer_id, referred_user_id, referral_code, status)
-      //          VALUES (?, ?, ?, 'active')`,
-      //         [referrer_id, userId, referral_code]
-      //       );
-      //       console.log(`✅ Referral created: User ${userId} referred by ${referrer_id}`);
-      //     }
-      //   } catch (referralError) {
-      //     console.error('Error processing referral:', referralError.message);
-      //     // Don't fail registration if referral processing fails
-      //   }
-      // }
-
       if (referral_code) {
+        console.log(`🔄 Processing referral code: ${referral_code} for new user ${userId}`);
         try {
           // Find referrer by their referral code stored on users table
           const [referrers] = await connection.execute(
             `SELECT id FROM users WHERE referral_code = ? LIMIT 1`,
             [referral_code]
           );
+          console.log(`🔍 Found ${referrers.length} referrers with code ${referral_code}`);
+          
           if (referrers.length > 0) {
             const referrer_id = referrers[0].id;
+            console.log(`✅ Found referrer: ${referrer_id}`);
+            
             await connection.execute(
               `INSERT INTO referrals (referrer_id, referred_user_id, referral_code, status)
             VALUES (?, ?, ?, 'active')`,
               [referrer_id, userId, referral_code]
             );
             console.log(`✅ Referral created: User ${userId} referred by ${referrer_id}`);
+          } else {
+            console.log(`⚠️ No referrer found with referral code: ${referral_code}`);
           }
         } catch (referralError) {
-          console.error('Error processing referral:', referralError.message);
+          console.error('❌ Error processing referral:', referralError.message);
+          console.error('Stack:', referralError.stack);
         }
+      } else {
+        console.log(`ℹ️ No referral code provided for user ${userId}`);
       }
 
       // Get created user
