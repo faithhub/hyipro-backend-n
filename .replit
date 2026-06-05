@@ -1,0 +1,58 @@
+modules = ["nodejs-20", "postgresql-16"]
+[agent]
+expertMode = true
+stack = "BEST_EFFORT_FALLBACK"
+
+[nix]
+channel = "stable-25_05"
+
+[userenv]
+
+[userenv.shared]
+PORT = "5000"
+NODE_ENV = "development"
+JWT_SECRET = "hyipro-super-secret-jwt-key-2024-minimum-32-chars-secure"
+JWT_EXPIRES_IN = "7d"
+FRONTEND_URL = "http://localhost:3000"
+RATE_LIMIT_WINDOW_MS = "900000"
+RATE_LIMIT_REGULAR_MAX = "1000"
+RATE_LIMIT_PREMIUM_MAX = "2000"
+RATE_LIMIT_AUTH_MAX = "100"
+RATE_LIMIT_ADMIN_BYPASS = "true"
+MIN_DEPOSIT = "50"
+MAX_DEPOSIT = "5000"
+MIN_WITHDRAWAL = "1000"
+MAX_WITHDRAWAL = "50000"
+MAX_FILE_SIZE = "5242880"
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Start application"
+
+[[workflows.workflow]]
+name = "Start application"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm start"
+waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
+[[ports]]
+localPort = 5000
+externalPort = 80
+
+[deployment]
+deploymentTarget = "autoscale"
+run = ["node", "server.js"]

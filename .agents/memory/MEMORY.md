@@ -1,0 +1,2 @@
+- [MySQL→PostgreSQL adapter](mysql-to-pg.md) — custom adapter in src/config/database.js mimics mysql2 pool API over pg; covers ? placeholders, CURDATE(), booleans, RETURNING id.
+- [Security hardening decisions](security-decisions.md) — key non-obvious choices made during security audit (KYC auth, lockout, cache invalidation pattern).

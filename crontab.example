@@ -1,0 +1,11 @@
+# Cron job for automated database backups
+# Add this to your crontab using: crontab -e
+
+# Backup database daily at 2 AM
+0 2 * * * cd /path/to/hyipro-backend && node scripts/backup-database.js >> logs/backup.log 2>&1
+
+# Backup database every 6 hours (alternative)
+# 0 */6 * * * cd /path/to/hyipro-backend && node scripts/backup-database.js >> logs/backup.log 2>&1
+
+# Backup database every hour (for critical data)
+# 0 * * * * cd /path/to/hyipro-backend && node scripts/backup-database.js >> logs/backup.log 2>&1

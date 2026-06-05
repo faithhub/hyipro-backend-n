@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "FgOB-5x4xPbTVnzVaYRJC"
+uri = "file://API_REFERENCE.md"
+type = "text"
+title = "HYIP Platform — Full API Reference"

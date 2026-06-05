@@ -1,0 +1,29 @@
+CREATE TABLE `plans` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `description` text DEFAULT NULL,
+  `min_deposit` decimal(18,8) NOT NULL,
+  `max_deposit` decimal(18,8) NOT NULL,
+  `daily_profit_percentage` decimal(5,2) NOT NULL,
+  `duration_days` int(11) NOT NULL,
+  `status` enum('active','paused','stopped') DEFAULT 'active',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `projected_return_weekly` decimal(10,4) DEFAULT NULL,
+  `estimated_monthly` decimal(10,4) DEFAULT NULL,
+  `capital_withdrawal` varchar(100) DEFAULT NULL,
+  `support_level` varchar(100) DEFAULT NULL,
+  `audience_label` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `plans`
+--
+
+INSERT INTO `plans` (`id`, `name`, `description`, `min_deposit`, `max_deposit`, `daily_profit_percentage`, `duration_days`, `status`, `created_at`, `updated_at`, `projected_return_weekly`, `estimated_monthly`, `capital_withdrawal`, `support_level`, `audience_label`) VALUES
+(1, 'Starter Plan', 'Here we go', 50.00000000, 99.00000000, 3.00, 30, 'stopped', '2026-05-30 19:34:17', '2026-05-30 20:34:00', NULL, NULL, NULL, NULL, NULL),
+(2, 'Growth Plan', 'For steady investors. Balanced risk-to-return plan.', 100.00000000, 299.00000000, 0.57, 30, 'active', '2026-05-31 17:09:16', '2026-05-31 17:39:52', 5.0000, 20.0000, 'End of cycle', 'Priority', NULL),
+(3, 'Advanced Plan', 'For experienced investors. Strong middle/high tier.', 300.00000000, 499.00000000, 0.64, 30, 'active', '2026-05-31 17:09:16', '2026-05-31 17:09:16', 4.5000, 18.0000, 'Flexible after maturity', 'Dedicated assistance', 'For experienced investors'),
+(4, 'Premium Elite Plan', 'For high-capital investors. Designed for larger portfolio holders.', 500.00000000, 5000.00000000, 0.71, 30, 'active', '2026-05-31 17:09:16', '2026-05-31 17:09:16', 5.0000, 20.0000, 'Flexible', 'VIP / 24/7 support', 'For high-capital investors');
+
+-
