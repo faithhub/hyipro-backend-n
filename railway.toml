@@ -1,0 +1,6 @@
+[build]
+buildCommand = ""
+
+[deploy]
+startCommand = "node server.js"
+preDeployCommand = "node scripts/migrate.js"
