@@ -827,10 +827,10 @@ const deleteUser = async (req, res, next) => {
       }
 
       // Delete related records first
-      await connection.execute('DELETE FROM earnings WHERE user_id = ?', [id]);
+      // Earnings are linked through subscriptions, so delete subscriptions first (cascade will handle earnings)
+      await connection.execute('DELETE FROM withdrawal_requests WHERE user_id = ?', [id]);
       await connection.execute('DELETE FROM transactions WHERE user_id = ?', [id]);
       await connection.execute('DELETE FROM subscriptions WHERE user_id = ?', [id]);
-      await connection.execute('DELETE FROM withdrawal_requests WHERE user_id = ?', [id]);
       await connection.execute('DELETE FROM users WHERE id = ?', [id]);
 
       logAudit(req, 'admin.user_deleted', { userId: parseInt(id), actorId: req.user.id, entityType: 'user', entityId: parseInt(id) });
